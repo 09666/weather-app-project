@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .app-container {
+      text-align: center;
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .input-container {
+      margin-bottom: 20px;
+    }
+
+    #location {
+      padding: 10px;
+      width: 200px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    #location:focus {
+      outline: none;
+      border-color: #66b3ff;
+    }
+
+    #getWeatherBtn {
+      padding: 10px 15px;
+      border: none;
+      background-color: #66b3ff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #getWeatherBtn:hover {
+      background-color: #5591cc;
+    }
+
+    .weather-info p {
+      font-size: 18px;
+      margin: 5px 0;
+    }
+
+    #error-message {
+      font-size: 16px;
+      color: red;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <h1>Weather App</h1>
+    
+    <!-- User input for location -->
+    <div class="input-container">
+      <input type="text" id="location" placeholder="Enter location" />
+      <button id="getWeatherBtn">Get Weather</button>
+    </div>
+    
+    <!-- Display weather information -->
+    <div class="weather-info" id="weatherInfo">
+      <p id="cityName">City: </p>
+      <p id="temperature">Temperature: --</p>
+      <p id="condition">Condition: --</p>
+      <p id="humidity">Humidity: --</p>
+      <p id="windSpeed">Wind Speed: --</p>
+    </div>
+    
+    <div id="error-message" style="color: red; display: none;">Please enter a valid location.</div>
+  </div>
+
+  <script>
+    // Select HTML elements
+    const locationInput = document.getElementById('location');
+    const getWeatherBtn = document.getElementById('getWeatherBtn');
+    const weatherInfo = document.getElementById('weatherInfo');
+    const cityName = document.getElementById('cityName');
+    const temperature = document.getElementById('temperature');
+    const condition = document.getElementById('condition');
+    const humidity = document.getElementById('humidity');
+    const windSpeed = document.getElementById('windSpeed');
+    const errorMessage = document.getElementById('error-message');
+
+    // Function to fetch weather data
+    const getWeatherData = async (location) => {
+      const apiKey = "2097886f13e24d0f8c450728250202";
+      const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=yes`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (response.ok) {
+          // Update UI with weather data
+          cityName.textContent = `City: ${data.location.name}`;
+          temperature.textContent = `Temperature: ${data.current.temp_c}°C`;
+          condition.textContent = `Condition: ${data.current.condition.text}`;
+          humidity.textContent = `Humidity: ${data.current.humidity}%`;
+          windSpeed.textContent = `Wind Speed: ${data.current.wind_kph} kph`;
+
+          // Hide error message and show weather info
+          errorMessage.style.display = 'none';
+          weatherInfo.style.display = 'block';
+        } else {
+          throw new Error('Location not found');
+        }
+      } catch (error) {
+        // Handle errors (e.g. invalid location)
+        errorMessage.style.display = 'block';
+        weatherInfo.style.display = 'none';
+      }
+    };
+
+    // Event listener for button click
+    getWeatherBtn.addEventListener('click', () => {
+      const location = locationInput.value.trim();
+      if (location) {
+        getWeatherData(location);
+      } else {
+        errorMessage.style.display = 'block';
+        weatherInfo.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
